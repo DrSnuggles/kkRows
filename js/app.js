@@ -33,8 +33,8 @@ webComp.setAttribute('data', data) // can be CSV(|,\n), JSON
 
 // HTML stylish
 document.body.insertAdjacentHTML('beforeEnd', `<br/>
-<kk-rows id="kk2" src="${location.origin}/kkRows/_test/songs.json" hide="0"></kk-rows>
-<kk-rows id="kk3" src="${location.origin}/kkRows/_test/songs.json" hide="0"></kk-rows>`)
+<kk-rows id="kk2" src="${location.origin}/kkRows/testdata/songs.json" hide="0"></kk-rows>
+<kk-rows id="kk3" src="${location.origin}/kkRows/testdata/songs.json" hide="0"></kk-rows>`)
 
 window.clickCallback = (o) => {
 	console.log('clickCallback', o)
