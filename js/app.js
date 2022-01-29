@@ -6,14 +6,29 @@
 
 import {kkRows} from './kk-rows.js'
 
+// generate demo CSV data
+let data = []
+console.time('generate data')
+for (let i = 0; i < 1000000; i++) {
+	const h = i.toString(16).padStart(5, '0')
+	const row = []
+	for (let j = 0; j < 26; j++) { // ASCII: A..Z
+		const ltr = String.fromCharCode(j + 65)
+		row[j] = ltr + h // integer is much faster than row[ltr]
+	}
+	data.push( row.join('|') )
+}
+data = data.join('\n')
+console.timeEnd('generate data')
+
 // object stylish
 let webComp = document.createElement('kk-rows')	// construct
 webComp.id = 'kk1'
 webComp.setAttribute('cb', `clickCallback`)		// click handler
-webComp.setAttribute('hide', `0`)				// do not show specified columns, they are still present in clicked object
+//webComp.setAttribute('hide', `0`)				// do not show specified columns, they are still present in clicked object
 document.body.appendChild(webComp)				// add to DOM
-//webComp.setAttribute('data', 'abc|def|ghi') // can be CSV(|,\n), JSON
-webComp.setAttribute('src', location.origin +'/kkRows/_test/songs.json')// url(full path) to json or csv
+webComp.setAttribute('data', data) // can be CSV(|,\n), JSON
+// alternative use: webComp.setAttribute('src', location.origin +'/kkRows/_test/songs.json')// url(full path) to json or csv
 //webComp.setAttribute('head', 'csv')	// use first line as headers
 
 // HTML stylish
