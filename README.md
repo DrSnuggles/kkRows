@@ -1,6 +1,11 @@
 # kkRows
 
-## Goal
+## Next level = WebComponent
+Done:
+- return of click
+- make it more configurable...
+
+## Goal (achived)
 Display 1 million rows in the browser with search.
 
 There is also another repository "hyperlist" which does similar.

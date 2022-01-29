@@ -3,18 +3,7 @@ body {
 	background: linear-gradient(45deg, #FFF, #BBB);
 	overflow: hidden;
 	font: 100% sans-serif;
-}
-#fInput {
-	width: 100%;
-	text-align: center;
-}
-	#fInput::placeholder {
-		text-align: center;
-	}
-#fInput:focus,
-#myTblScroll:focus
-{
-	outline: none;
+	height: 100vh;
 }
 footer {
 	position: absolute;
@@ -27,27 +16,15 @@ footer {
 		text-align: right;
 	}
 
-#myTblDiv {
-	height: calc(100vh - 39px);
-	overflow-y: none;
-	font: 80% sans-serif;
+#kk1 {
+	width: 100%;
+	height: 50%;
 }
-	#myTblDiv table {
-		border-spacing: 0;
-		width: calc(100vw - 20px);
-	}
-		#myTblDiv table td {
-			padding: 0;
-			width: calc(100% / 26);
-			overflow: hidden;
-			text-overflow: ellipsis;
-			display: inline-block;
-		}
-#myTblScroll {
-	position: absolute;
-	margin: 0;
-	right: calc(-100vh + 39px);
-	width: calc(100vh - 39px);
-	transform-origin: 0 0;
-	transform: rotate(90deg);
+#kk2 {
+	width: 45%;
+	height: 45%;
+}
+#kk3 {
+	width: 45%;
+	height: 45%;
 }
