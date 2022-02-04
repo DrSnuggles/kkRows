@@ -1,0 +1,38 @@
+</style>
+<div id="kkOuter">
+	<input id="fInput" placeholder="Type search term"/>
+	<input type="range" id="myTblScroll" min="0" max="1" step="0.0000001" value="0"/>
+	<div id="myTblDiv"></div>
+</div>
+`
+
+window.kkRowsCallback = (o, cb) => {
+	// bit hacky in window global but onclick needs that
+	const j = {
+		from: o.parentElement.parentElement.getRootNode().host.id
+	}
+	o.querySelectorAll('td').forEach((td, ind) => {
+		j[ind] = td.innerHTML
+	})
+	cb(j)
+}
+
+export class kkRows extends HTMLElement {
+	static get observedAttributes() {
+		return ['data', 'src', 'head', 'cb', 'hide']
+	}
+
+	constructor() {
+		super()
+		this._shadowRoot = this.attachShadow({mode: 'closed'}) // with closed, a ShadowRoot reference needs to be stored
+		//this.attachShadow({mode: 'open'}) // open or closed
+		this._shadowRoot.appendChild(template.content.cloneNode(true))
+		this.initWorker()
+		this.initHandler()
+	}
+
+	initWorker() {
+		//const worker = new Worker(location.origin +'/kkRows/js/worker.js', {type: 'module'})
+
+		// ToDo: inline worker would reduce another request, best pre tersered
+		const blob = new Blob([`

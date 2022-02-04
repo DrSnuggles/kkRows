@@ -74,8 +74,18 @@ template.innerHTML = `
 	<input id="fInput" placeholder="Type search term"/>
 	<input type="range" id="myTblScroll" min="0" max="1" step="0.0000001" value="0"/>
 	<div id="myTblDiv"></div>
-</div>
-`
+</div>`
+
+window.kkRowsCallback = (o, cb) => {
+	// bit hacky in window global but onclick needs that
+	const j = {
+		from: o.parentElement.parentElement.getRootNode().host.id
+	}
+	o.querySelectorAll('td').forEach((td, ind) => {
+		j[ind] = td.innerHTML
+	})
+	cb(j)
+}
 
 export class kkRows extends HTMLElement {
 	static get observedAttributes() {
@@ -87,31 +97,36 @@ export class kkRows extends HTMLElement {
 		this._shadowRoot = this.attachShadow({mode: 'closed'}) // with closed, a ShadowRoot reference needs to be stored
 		//this.attachShadow({mode: 'open'}) // open or closed
 		this._shadowRoot.appendChild(template.content.cloneNode(true))
-		//this.shadowRoot.querySelector('h3').innerText = this.getAttribute('name')
 		this.initWorker()
 		this.initHandler()
 	}
 
 	initWorker() {
-		const worker = new Worker(location.origin +'/kkRows/js/worker.js', {type: 'module'})
+		const worker = new Worker(location.origin +'/kkRows/_src/worker.js', {type: 'module'})
 
 		// ToDo: inline worker would reduce another request, best pre tersered
-		//const blob = new Blob([``], {type:'text/javascript'})
+		//const blob = new Blob([txt], {type:'text/javascript'})
 		//const worker = new Worker(URL.createObjectURL(blob))
 
 		this.worker = worker	// store for later
 		worker.onmessage = (e) => {
 			//console.log('From worker', e.data)
-			if (e.data.tbl) {
-				//document.body.insertAdjacentHTML('beforeEnd', e.data.tbl)
-				this._shadowRoot.getElementById('myTblScroll').value = e.data.actRow / e.data.len
+			const dat = e.data
+			if (dat.tbl) {
+				//document.body.insertAdjacentHTML('beforeEnd', dat.tbl)
+
+				// update scrollbar
+				const myTblScroll = this._shadowRoot.getElementById('myTblScroll')
+				myTblScroll.value = dat.actRow / dat.len
+				myTblScroll.title = `${dat.actRow}-${dat.endRow} / ${dat.len}`
+
 				const myTblDiv = this._shadowRoot.getElementById('myTblDiv')
 				if (myTblDiv.childNodes.length === 0) {
-					myTblDiv.innerHTML = e.data.tbl
+					myTblDiv.innerHTML = dat.tbl
 					this.resizer()
 				} else {
 					myTblDiv.childNodes[0].remove() // important else garbage grows
-					myTblDiv.innerHTML = e.data.tbl
+					myTblDiv.innerHTML = dat.tbl
 				}
 
 				return
@@ -185,6 +200,12 @@ export class kkRows extends HTMLElement {
 		}})
 	}
 
+	attributeChangedCallback(att, old, upd) {
+		//console.log('attribute changed', att, old, upd)
+		// just send to worker
+		this.worker.postMessage({[att]: upd})
+	}
+	/*
 	connectedCallback() {
 		console.log('added to DOM')
 		//this.h3 = this.getAttribute("name")
@@ -199,16 +220,10 @@ export class kkRows extends HTMLElement {
 		console.log('moved in DOM')
 	}
 
-	attributeChangedCallback(att, old, upd) {
-		//console.log('attribute changed', att, old, upd)
-		// just send to worker
-		this.worker.postMessage({[att]: upd})
-	}
-
 	render() {
 		//this.h3
 	}
-
+	*/
 }
 
 customElements.define('kk-rows', kkRows)

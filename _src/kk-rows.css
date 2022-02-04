@@ -1,0 +1,58 @@
+:host {
+	height: 100%; /* else no resize change */
+	display: inline-block;
+}
+#kkOuter {
+	position: relative;
+	width: 100%;
+	min-height: 100%;
+}
+#fInput {
+	width: calc(100% - 10px);
+	text-align: center;
+}
+	#fInput::placeholder {
+		text-align: center;
+	}
+#fInput:focus,
+#myTblScroll:focus
+{
+	outline: none;
+}
+#myTblDiv {
+	height: calc(25vh - 39px);
+	overflow-y: none;
+	font: 80% sans-serif;
+}
+	#myTblDiv table {
+		border-spacing: 0;
+		width: calc(100% - 20px);
+	}
+		#myTblDiv table td,
+		#myTblDiv table th {
+			padding: 0;
+			/*width: calc(100% / 26);*/
+			overflow: hidden;
+			text-overflow: ellipsis;
+			display: inline-block;
+			white-space: nowrap;
+		}
+		#myTblDiv table td {
+			cursor: pointer;
+		}
+		#myTblDiv table th {
+			background: #0001;
+			text-align: left;
+		}
+#myTblScroll {
+	position: absolute;
+	margin: 0;
+	margin-top: 22px;
+	/*right: calc(-25vh + 39px);*/
+	width: calc(25vh - 39px);
+	transform-origin: 0 0;
+	transform: rotate(90deg);
+}
+#myTblDiv table td.hidden {
+	display: none;
+}

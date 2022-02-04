@@ -1,0 +1,12 @@
+/*	kk-rows web component
+	based on: https://www.section.io/engineering-education/how-to-create-a-web-component-with-vanilla-javascript/
+	and: https://www.thinktecture.com/en/web-components/native-web-components-without-framework/
+	and: https://www.hosteurope.de/blog/web-components-spass-auch-mal-ohne-frameworks/
+	
+	- Custom Elements
+	- shadow DOM
+	- HTML Templates
+*/
+
+const template = document.createElement('template')
+template.innerHTML = `<style>

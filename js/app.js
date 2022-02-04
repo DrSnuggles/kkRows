@@ -4,7 +4,8 @@
 	<kk-rows data="abc|def|ghi" src="./_test/packs.csv" head="Col 1 Head|Col 2 Head|Col 3 Head"></kk-rows>
 */
 
-import {kkRows} from './kk-rows.js'
+//import {kkRows} from '../_src/kk-rows_dev.js'
+import {kkRows} from '../js/kk-rows.min.js'
 
 // generate demo CSV data
 let data = []
@@ -33,7 +34,7 @@ webComp.setAttribute('data', data) // can be CSV(|,\n), JSON
 
 // HTML stylish
 document.body.insertAdjacentHTML('beforeEnd', `<br/>
-<kk-rows id="kk2" src="${location.origin}/kkRows/testdata/songs.json" hide="0"></kk-rows>
+<kk-rows id="kk2" cb="clickCallback" src="${location.origin}/kkRows/testdata/songs.json" hide="0" head="Archive|Author|Title"></kk-rows>
 <kk-rows id="kk3" src="${location.origin}/kkRows/testdata/songs.json" hide="0"></kk-rows>`)
 
 window.clickCallback = (o) => {

@@ -41,10 +41,11 @@ function filter(wordStr) {
 		filtered = []
 		// walk thru rows
 		// all words have to be the row
+		const wordCnt = words.length
 		data.forEach((r) => {
 			const haystack = r.join('|').toLowerCase()
 			let foundWords = 0
-			for (let w = 0; w < words.length; w++) {
+			for (let w = 0; w < wordCnt; w++) {
 				const needle = words[w].toLowerCase()
 				if (haystack.indexOf(needle) > -1) {
 					foundWords++
@@ -52,7 +53,7 @@ function filter(wordStr) {
 					break // no need to search for other words
 				}
 			}
-			if (foundWords === words.length) {
+			if (foundWords === wordCnt) {
 				filtered.push( r )
 			}
 		})
@@ -65,26 +66,21 @@ function filter(wordStr) {
 }
 
 function sendRows(dir = -1, scrollTo) {
-	const dat = []
-
+	// find how many rows to display
 	const len = filtered.length
-
 	let stepSize = (dir == 1) ? dispCnt/2 : -dispCnt/2
 	actRow += stepSize
 	if (scrollTo == scrollTo*1) actRow = scrollTo * len
 	actRow = Math.floor(actRow)
 	if (actRow > len - dispCnt ) actRow = len - dispCnt
 	if (actRow < 0 ) actRow = 0
-	
+
 	let endRow = actRow + dispCnt
-	if (head.length > 0) endRow--
-	for (let i = actRow; i < endRow; i++) {
-		if (filtered[i])
-			dat.push( filtered[i] )
-	}
+
+	const dat = filtered.slice(actRow, endRow)
 
 	//postMessage({tbl: makeTbl(dat), actRow: actRow, len: len, cols: dat[0]?.length})
-	postMessage({tbl: makeTbl(dat), actRow: actRow, len: len})
+	postMessage({tbl: makeTbl(dat), actRow: actRow, endRow: endRow, len: len})
 }
 
 function makeTbl(rows) {
@@ -100,16 +96,20 @@ function makeTbl(rows) {
 		html.push('</thead>')
 	}
 
-	for (let i = 0, n = rows.length; i < n; i++) {
-		const oncli = (callback) ? ' onclick="'+ callback +'(this)"' : ''
-		html.push('<tr'+ oncli +'>')
-		for (let c = 0, nn = rows[0].length; c < nn; c++) {
-			//if (hide.indexOf(c+'') !== -1) continue // do not show this column
-			const dispMe = (hide.indexOf(c+'') !== -1) ? ' class="hidden"' : ''
-			html.push('<td'+ dispMe +' width="'+ (100/(nn-hide.length)) +'%" title="'+ rows[i][c] +'">'+ rows[i][c] +'</td>')
-		}
-		html.push('</tr>')
+	if (rows.length > 0) {
+		const oncli = (callback) ? ' onclick="kkRowsCallback(this, '+ callback +')"' : ''
+		const colWidth = 100/(rows[0].length-hide.length)
+		rows.forEach((row) => {
+			html.push('<tr'+ oncli +'>')
+			row.forEach((col, colInd) => {
+				//if (hide.indexOf(c+'') !== -1) continue // do not show this column, no want to keep maybe for IDs
+				const dispMe = (hide.indexOf(colInd+'') !== -1) ? ' class="hidden"' : ''
+				html.push('<td'+ dispMe +' width="'+ colWidth +'%" title="'+ col +'">'+ col +'</td>')
+			})
+			html.push('</tr>')
+		})
 	}
+
 	html.push('</table>')
 	html = html.join('')
 	//console.timeEnd('makeTbl')
@@ -182,6 +182,7 @@ onmessage = function(e) {
 	}
 	if (e.data.resize) {
 		dispCnt = e.data.resize.rows
+		if (head.length > 0) dispCnt--
 		sendRows(-1, actRow/filtered.length)
 		return
 	}
@@ -199,7 +200,7 @@ onmessage = function(e) {
 	}
 	if (e.data.head) {
 		head = e.data.head.split('|') 
-		console.log('head set to', head)
+		//console.log('head set to', head)
 		return
 	}
 	if (e.data.hide) {
