@@ -31,10 +31,22 @@ document.body.appendChild(webComp)				// add to DOM
 webComp.setAttribute('data', data) // can be CSV(|,\n), JSON
 // alternative use: webComp.setAttribute('src', location.origin +'/kkRows/_test/songs.json')// url(full path) to json or csv
 //webComp.setAttribute('head', 'csv')	// use first line as headers
+// set your own style
+webComp.setAttribute('css', `
+tr:nth-child(odd) {
+	background: #0F02;
+}
+tr:nth-child(even) {
+	background: #FF02;
+}
+td {
+	font: 90% monospace;
+}
+`)
 
 // HTML stylish
 document.body.insertAdjacentHTML('beforeEnd', `<br/>
-<kk-rows id="kk2" cb="clickCallback" src="${location.origin}/kkRows/testdata/songs.json" hide="0" head="Archive|Author|Title"></kk-rows>
+<kk-rows id="kk2" cb="clickCallback" src="${location.origin}/kkRows/testdata/songs.json" hide="0" head="Archive|Author|Title" css="td:nth-child(2),th:nth-child(1){width:100px}td:nth-child(3),th:nth-child(2){width:50px}td:nth-child(4),t5:nth-child(3){width:200px}"></kk-rows>
 <kk-rows id="kk3" src="${location.origin}/kkRows/testdata/songs.json" hide="0"></kk-rows>`)
 
 window.clickCallback = (o) => {

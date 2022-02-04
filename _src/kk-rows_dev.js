@@ -89,7 +89,7 @@ window.kkRowsCallback = (o, cb) => {
 
 export class kkRows extends HTMLElement {
 	static get observedAttributes() {
-		return ['data', 'src', 'head', 'cb', 'hide']
+		return ['data', 'src', 'head', 'cb', 'hide', 'css']
 	}
 
 	constructor() {
@@ -202,7 +202,14 @@ export class kkRows extends HTMLElement {
 
 	attributeChangedCallback(att, old, upd) {
 		//console.log('attribute changed', att, old, upd)
-		// just send to worker
+
+		// attributes we need to handle here
+		if (att == 'css') {
+			this._shadowRoot.children[0].insertAdjacentHTML('afterEnd', `<style>${upd.replace(/\n/g,'')}</style>` )
+			return
+		}
+
+		// rest send to worker
 		this.worker.postMessage({[att]: upd})
 	}
 	/*

@@ -1,10 +1,7 @@
 # kkRows
 
-## ToDo / TaDa
-- Customizable style
-+ Show number of rows
-+ JSON return value for callback
-+ Minimized to a single JS file (also brotli compressed)
+## ToDo
+- Fix that thead and tbody have different childLength
 
 ## Idea
 Display 1 million rows in the browser with search.

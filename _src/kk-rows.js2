@@ -19,7 +19,7 @@ window.kkRowsCallback = (o, cb) => {
 
 export class kkRows extends HTMLElement {
 	static get observedAttributes() {
-		return ['data', 'src', 'head', 'cb', 'hide']
+		return ['data', 'src', 'head', 'cb', 'hide', 'css']
 	}
 
 	constructor() {
