@@ -1,7 +1,7 @@
 # kkRows
 
 ## ToDo
-- Fix that thead and tbody have different childLength
+- Fix that thead and tbody have different childLength, thats unnice for CSS and brain
 
 ## Idea
 Display 1 million rows in the browser with search.

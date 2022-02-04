@@ -146,6 +146,10 @@ function parseCSV(t) {
 		const cols = r.split('|')
 		if (r != '') data.push( cols )
 	})
+	if (head == 'csv') {
+		head = data[0]
+		data.splice(0,1)
+	}
 	filtered = [...data]
 	console.timeEnd('parseCSV')
 	actRow = 0

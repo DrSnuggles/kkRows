@@ -47,7 +47,7 @@ td {
 // HTML stylish
 document.body.insertAdjacentHTML('beforeEnd', `<br/>
 <kk-rows id="kk2" cb="clickCallback" src="${location.origin}/kkRows/testdata/songs.json" hide="0" head="Archive|Author|Title" css="td:nth-child(2),th:nth-child(1){width:100px}td:nth-child(3),th:nth-child(2){width:50px}td:nth-child(4),t5:nth-child(3){width:200px}"></kk-rows>
-<kk-rows id="kk3" src="${location.origin}/kkRows/testdata/songs.json" hide="0"></kk-rows>`)
+<kk-rows id="kk3" src="${location.origin}/kkRows/testdata/modarchive.csv" head="csv" css="td:nth-child(1),th:nth-child(1){width:80%}td:nth-child(2),th:nth-child(2){text-align:right;width:20%}"></kk-rows>`)
 
 window.clickCallback = (o) => {
 	console.log('clickCallback', o)
