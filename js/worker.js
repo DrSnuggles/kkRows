@@ -7,7 +7,7 @@
 */
 
 let data = []	// holds 1 million rows
-let filtered = [] // filtered data
+let filtered = [] // filtered data, ToDo: rethink this because its doubling the data
 let actRow = 0 //
 let dispCnt = 1 // how many rows do we want to display (todo: determine by container height and rendered row height)
 let head = []
@@ -40,26 +40,22 @@ function filter(wordStr) {
 		// AND filter
 		filtered = []
 		// walk thru rows
-		// all words have to be in at least one col
-		for (let i = 0; i < data.length; i++) {
+		// all words have to be the row
+		data.forEach((r) => {
+			const haystack = r.join('|').toLowerCase()
 			let foundWords = 0
 			for (let w = 0; w < words.length; w++) {
-				let needle = words[w].toLowerCase()
-				//console.log(needle)
-				for (let k = 0; k < data[0].length; k++) {
-					let haystack = data[i][k].toLowerCase()
-					//if (k === 0) console.log(haystack, needle, haystack.indexOf(needle))
-					if (haystack.indexOf(needle) > -1) {
-						foundWords++
-						break // just count a word once
-					}
+				const needle = words[w].toLowerCase()
+				if (haystack.indexOf(needle) > -1) {
+					foundWords++
+				} else {
+					break // no need to search for other words
 				}
 			}
 			if (foundWords === words.length) {
-				filtered.push( data[i] )
+				filtered.push( r )
 			}
-		}
-
+		})
 	}
 
 	console.timeEnd('Filter')
@@ -90,7 +86,6 @@ function sendRows(dir = -1, scrollTo) {
 	//postMessage({tbl: makeTbl(dat), actRow: actRow, len: len, cols: dat[0]?.length})
 	postMessage({tbl: makeTbl(dat), actRow: actRow, len: len})
 }
-
 
 function makeTbl(rows) {
 	//console.time('makeTbl')
@@ -146,7 +141,7 @@ function parseCSV(t) {
 	// use | as col sep. and LF as row sep.
 	console.time('parseCSV')
 	data = []
-	const rows = t.split('\n')
+	const rows = t.split( String.fromCharCode(10) )
 	rows.forEach((r) => {
 		const cols = r.split('|')
 		if (r != '') data.push( cols )
@@ -167,32 +162,6 @@ function parseJSON(j) {
 	sendRows()
 	postMessage({resizeNeeded:true})
 }
-
-//
-// load data
-//
-/*
-function genTestData() {
-	// 1 millions rows 26 columns
-	console.time('generate data')
-	for (let i = 0; i < 1000000; i++) {
-		const h = i.toString(16).padStart(5, '0')
-		const row = {}
-		for (let j = 0; j < 26; j++) { // ASCII: A..Z
-			const ltr = String.fromCharCode(j + 65)
-			row[j] = ltr + h // integer is much faster
-			//row[ltr] = ltr + h // than char
-		}
-		data.push( row )
-	}
-	console.timeEnd('generate data')
-	
-	console.time('copy data')
-	// 16s deep copy !! filtered = JSON.parse( JSON.stringify(data) )	// default to unfiltered data
-	filtered = [...data] // 2ms, shallow copy
-	console.timeEnd('copy data')
-}
-*/
 
 onmessage = function(e) {
 	// most used on top
