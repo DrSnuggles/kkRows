@@ -118,7 +118,7 @@ export class kkRows extends HTMLElement {
 				// update scrollbar
 				const myTblScroll = this._shadowRoot.getElementById('myTblScroll')
 				myTblScroll.value = dat.actRow / dat.len
-				myTblScroll.title = `${dat.actRow}-${(dat.endRow<dat.len) ? dat.endRow : dat.len} / ${dat.len}`
+				myTblScroll.title = `${dat.actRow+1}-${(dat.endRow<dat.len) ? dat.endRow : dat.len} / ${dat.len}`
 
 				const myTblDiv = this._shadowRoot.getElementById('myTblDiv')
 				if (myTblDiv.childNodes.length === 0) {
