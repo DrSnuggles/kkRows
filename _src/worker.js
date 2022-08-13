@@ -100,11 +100,12 @@ function makeTbl(rows) {
 		const oncli = (callback) ? ' onclick="kkRowsCallback(this, '+ callback +')"' : ''
 		const colWidth = 100/(rows[0].length-hide.length)
 		rows.forEach((row) => {
-			html.push('<tr'+ oncli +'>')
+			//html.push('<tr'+ oncli +'>')
+			html.push('<tr>')
 			row.forEach((col, colInd) => {
 				//if (hide.indexOf(c+'') !== -1) continue // do not show this column, no want to keep maybe for IDs
 				const dispMe = (hide.indexOf(colInd+'') !== -1) ? ' class="hidden"' : ''
-				html.push('<td'+ dispMe +' width="'+ colWidth +'%" title="'+ col +'">'+ col +'</td>')
+				html.push('<td'+ oncli +''+ dispMe +' width="'+ colWidth +'%" title="'+ col +'">'+ col +'</td>')
 			})
 			html.push('</tr>')
 		})

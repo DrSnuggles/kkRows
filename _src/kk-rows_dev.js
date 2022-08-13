@@ -79,9 +79,10 @@ template.innerHTML = `
 window.kkRowsCallback = (o, cb) => {
 	// bit hacky in window global but onclick needs that
 	const j = {
-		from: o.parentElement.parentElement.getRootNode().host.id
+		from: o.parentElement.parentElement.getRootNode().host.id,
+		sel: o.innerText,
 	}
-	o.querySelectorAll('td').forEach((td, ind) => {
+	o.parentElement.querySelectorAll('td').forEach((td, ind) => {
 		j[ind] = td.innerHTML
 	})
 	cb(j)
