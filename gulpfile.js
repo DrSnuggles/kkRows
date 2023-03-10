@@ -26,7 +26,13 @@ gulp.task('js', () => {
 		'_src/kk-rows.js3'
 	])
 	.pipe(concat('kk-rows.min.js'))
-	.pipe(terser())
+	.pipe(terser({
+		ecma: 6,
+		keep_fnames: false,
+		mangle: {
+			toplevel: true,
+		},
+	  }))
     .pipe(gulp.dest('js'))
 })
 
