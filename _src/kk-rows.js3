@@ -30,6 +30,12 @@
 				return
 			}
 
+			if (e.data.rng) {
+				window.kkRowsCallback(e.data.rng, eval(e.data.callback))	// evil eval
+				return
+			}
+
+			console.log('Unknown message:', e)
 		}
 
 		//worker.postMessage({msg:'getRows'})

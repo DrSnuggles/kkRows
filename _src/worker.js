@@ -83,6 +83,22 @@ function sendRows(dir = -1, scrollTo) {
 	postMessage({tbl: makeTbl(dat), actRow: actRow, endRow: endRow, len: len})
 }
 
+function getRandom(callback, amount = 1, src = filtered) {
+	// return random row(s)
+	const rngRow = src[getRandomInt(0, src.length-1)]
+	//console.log('getRandom', rngRow)
+	postMessage( {rng: rngRow, callback: callback} )
+}
+function getRandomInt(min, max) {
+	const byteArray = new Uint32Array(1)	// Uint16 = 0..65,535, Uint32 = 0..4,294,967,295
+	crypto.getRandomValues(byteArray)
+	const range = max - min + 1
+	const max_range = 4294967295 //65536
+	if (byteArray[0] >= Math.floor(max_range / range) * range) return getRandomInt(min, max)
+
+	return min + (byteArray[0] % range)
+}
+
 function makeTbl(rows) {
 	//console.time('makeTbl')
 	let html = []
@@ -215,6 +231,9 @@ onmessage = function(e) {
 	switch (e.data.msg) {
 		case 'getRows':
 			sendRows(e.data.dir, e.data.scrollTo)
+			break
+		case 'getRandom':
+			getRandom(e.data.callback)	// (cb, amount, source) source filtered = default
 			break
 		default:
 			console.error('Unknown message from Module got: ', e.data)

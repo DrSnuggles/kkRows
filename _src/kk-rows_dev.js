@@ -78,13 +78,21 @@ template.innerHTML = `
 
 window.kkRowsCallback = (o, cb) => {
 	// bit hacky in window global but onclick needs that
-	const j = {
-		from: o.parentElement.parentElement.getRootNode().host.id,
-		sel: o.innerText,
+	let j
+	if (o.parentElement) {
+		j = {
+			from: o.parentElement.parentElement.getRootNode().host.id,
+			sel: o.innerText,
+		}
+		o.parentElement.querySelectorAll('td').forEach((td, ind) => {
+			j[ind] = td.innerHTML
+		})
+	} else {
+		// random or next/prev, feels even more hacky
+		j = {
+			rng: o,
+		}
 	}
-	o.parentElement.querySelectorAll('td').forEach((td, ind) => {
-		j[ind] = td.innerHTML
-	})
 	cb(j)
 }
 
@@ -138,6 +146,12 @@ export class kkRows extends HTMLElement {
 				return
 			}
 
+			if (e.data.rng) {
+				window.kkRowsCallback(e.data.rng, eval(e.data.callback))	// evil eval
+				return
+			}
+
+			console.log('Unknown message:', e)
 		}
 
 		//worker.postMessage({msg:'getRows'})

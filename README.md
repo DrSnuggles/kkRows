@@ -5,6 +5,9 @@
 - Displays a line too much if header is present, could not find anymore...
 - Too wide when no whitespace to break.. ellipsis
 
+## TaDa
+- Random entry: myTbl.worker.postmessage({msg:'rng', callback: 'myRngCallback'})
+
 ## Idea
 Display 1 million rows in the browser with search.
 
