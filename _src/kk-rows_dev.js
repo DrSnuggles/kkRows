@@ -76,13 +76,16 @@ template.innerHTML = `
 	<div id="myTblDiv"></div>
 </div>`
 
-window.kkRowsCallback = (o, cb) => {
+window.kkRowsCallback = (o, cb, evNum) => {
 	// bit hacky in window global but onclick needs that
+	// Events: LMB, RMB, DBL, DRAG, RNG
+	const evTyp = ['LMB','RMB','DBL']
 	let j
 	if (o.parentElement) {
 		j = {
 			from: o.parentElement.parentElement.getRootNode().host.id,
 			sel: o.innerText,
+			ev: evTyp[evNum],
 		}
 		o.parentElement.querySelectorAll('td').forEach((td, ind) => {
 			j[ind] = td.innerHTML
@@ -91,6 +94,7 @@ window.kkRowsCallback = (o, cb) => {
 		// random or next/prev, feels even more hacky
 		j = {
 			rng: o,
+			ev: 'RNG'
 		}
 	}
 	cb(j)

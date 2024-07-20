@@ -113,15 +113,19 @@ function makeTbl(rows) {
 	}
 
 	if (rows.length > 0) {
-		const oncli = (callback) ? ' onclick="kkRowsCallback(this, '+ callback +')"' : ''
+		let onLMB = '', onDBL = '', onRMB = ''
+		if (callback) {
+			onLMB = ' onclick="kkRowsCallback(this,'+ callback +',0)"'
+			onDBL = ' ondblclick="kkRowsCallback(this,'+ callback +',2)"'
+			onRMB = ' oncontextmenu="kkRowsCallback(this,'+ callback +',1)"'
+		}
 		const colWidth = 100/(rows[0].length-hide.length)
 		rows.forEach((row) => {
-			//html.push('<tr'+ oncli +'>')
 			html.push('<tr>')
 			row.forEach((col, colInd) => {
 				//if (hide.indexOf(c+'') !== -1) continue // do not show this column, no want to keep maybe for IDs
 				const dispMe = (hide.indexOf(colInd+'') !== -1) ? ' class="hidden"' : ''
-				html.push('<td'+ oncli +''+ dispMe +' width="'+ colWidth +'%" title="'+ col +'">'+ col +'</td>')
+				html.push('<td'+ onLMB + onRMB + onDBL + dispMe +' width="'+ colWidth +'%" title="'+ col +'">'+ col +'</td>')
 			})
 			html.push('</tr>')
 		})
