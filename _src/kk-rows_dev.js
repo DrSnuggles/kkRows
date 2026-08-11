@@ -80,32 +80,8 @@ template.innerHTML = `
 	<div id="myTblDiv"></div>
 </div>`
 
-window.kkRowsCallback = (o, cb, evNum, idx) => {
-	// builds the callback object, kept global for compatibility
-	// Events: LMB, RMB, DBL, DRAG, RNG
-	const evTyp = ['LMB','RMB','DBL']
-	let j
-	if (o.parentElement) {
-		j = {
-			from: o.parentElement.parentElement.getRootNode().host.id,
-			sel: o.innerText,
-			ev: evTyp[evNum],
-			idx: o.parentElement.dataset.idx *1,	// index inside data, feed back into goto()
-		}
-		o.parentElement.querySelectorAll('td').forEach((td, ind) => {
-			j[ind] = td.innerHTML
-		})
-	} else {
-		// random or next/prev, feels even more hacky
-		j = {
-			rng: o,
-			ev: 'RNG',
-			idx: idx,
-		}
-	}
-	if (typeof cb === 'function') cb(j)
-	return j
-}
+// Events: LMB, RMB, DBL, DRAG, RNG
+const evTyp = ['LMB','RMB','DBL']
 
 export class kkRows extends HTMLElement {
 	static get observedAttributes() {
@@ -158,12 +134,7 @@ export class kkRows extends HTMLElement {
 			}
 
 			if (e.data.rng) {
-				this.fire( window.kkRowsCallback(e.data.rng, null, 4, e.data.idx), e.data.callback )
-				return
-			}
-
-			if (e.data.selHidden !== undefined) {
-				// marked row is not part of the current filter, mark stays and shows up again when it matches
+				this.fire( {rng: e.data.rng, ev: 'RNG', idx: e.data.idx}, e.data.callback )
 				return
 			}
 
@@ -173,6 +144,14 @@ export class kkRows extends HTMLElement {
 		//worker.postMessage({msg:'getRows'})
 
 	} // initWorker
+
+	rowObj(td, evNum) {
+		// what a row event reports, idx can be fed back into goto()
+		const tr = td.parentElement
+		const j = {from: this.id, sel: td.innerText, ev: evTyp[evNum], idx: tr.dataset.idx *1}
+		tr.querySelectorAll('td').forEach((c, ind) => j[ind] = c.innerHTML)
+		return j
+	}
 
 	fire(j, cbName = this.cb) {
 		// CustomEvent for addEventListener('kk-rows', ...) and the cb attribute for the old way
@@ -189,7 +168,7 @@ export class kkRows extends HTMLElement {
 			myTblDiv.addEventListener(evName, (e) => {
 				const td = e.target.closest('td')
 				if (!td) return
-				const j = window.kkRowsCallback(td, null, evNum[evName])
+				const j = this.rowObj(td, evNum[evName])
 				this.mark(j.idx)	// clicked row gets marked, hide it with :host{--kk-sel:transparent}
 				this.fire(j)
 			})
@@ -239,9 +218,9 @@ export class kkRows extends HTMLElement {
 		}
 	} // initHandler
 
-	goto(idx, center = true) {
-		// jump to row and mark it, idx is the index inside data (see idx of the click callback)
-		this.worker.postMessage({sel: idx, center: center})
+	goto(idx) {
+		// scroll row into the middle of the view and mark it, idx is the index inside data
+		this.worker.postMessage({sel: idx})
 	}
 
 	mark(idx) {
@@ -270,7 +249,10 @@ export class kkRows extends HTMLElement {
 		//console.log('attribute changed', att, old, upd)
 
 		// attributes we need to handle here
-		if (att == 'cb') this.cb = upd	// name of the callback function, also send to worker as rng default
+		if (att == 'cb') { // name of the callback function, the worker does not need to know it
+			this.cb = upd
+			return
+		}
 
 		if (att == 'css') {
 			this._shadowRoot.children[0].insertAdjacentHTML('afterEnd', `<style>${upd.replace(/\n/g,'')}</style>` )

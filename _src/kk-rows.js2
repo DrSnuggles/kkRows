@@ -6,32 +6,8 @@
 </div>
 `
 
-window.kkRowsCallback = (o, cb, evNum, idx) => {
-	// builds the callback object, kept global for compatibility
-	// Events: LMB, RMB, DBL, DRAG, RNG
-	const evTyp = ['LMB','RMB','DBL']
-	let j
-	if (o.parentElement) {
-		j = {
-			from: o.parentElement.parentElement.getRootNode().host.id,
-			sel: o.innerText,
-			ev: evTyp[evNum],
-			idx: o.parentElement.dataset.idx *1,	// index inside data, feed back into goto()
-		}
-		o.parentElement.querySelectorAll('td').forEach((td, ind) => {
-			j[ind] = td.innerHTML
-		})
-	} else {
-		// random or next/prev, feels even more hacky
-		j = {
-			rng: o,
-			ev: 'RNG',
-			idx: idx,
-		}
-	}
-	if (typeof cb === 'function') cb(j)
-	return j
-}
+// Events: LMB, RMB, DBL, DRAG, RNG
+const evTyp = ['LMB','RMB','DBL']
 
 export class kkRows extends HTMLElement {
 	static get observedAttributes() {

@@ -11,7 +11,6 @@ let filtered = [] // filtered data, ToDo: rethink this because its doubling the 
 let actRow = 0 //
 let dispCnt = 1 // how many rows do we want to display (todo: determine by container height and rendered row height)
 let head = []
-let callback = false
 let hide = []
 let selIdx = -1 // marked row, index inside data (survives filtering)
 
@@ -22,20 +21,15 @@ function setIndex() {
 	selIdx = -1
 }
 
-function gotoRow(idx, center = true, scroll = true) {
-	// jump to and mark a row, idx is the index inside data
+function gotoRow(idx, scroll = true) {
+	// mark a row, idx is the index inside data, scroll it into the middle of the view
 	if (isNaN(idx)) return
 	selIdx = idx
-	if (!scroll) { // mark only, view stays where it is
-		sendRows(0)
-		return
+	if (scroll) {
+		const pos = filtered.findIndex((r) => r._i === idx)
+		if (pos === -1) return // filtered out, mark is kept and shows up again when it matches
+		actRow = pos - Math.floor(dispCnt/2)
 	}
-	const pos = filtered.findIndex((r) => r._i === idx)
-	if (pos === -1) {
-		postMessage({selHidden: idx}) // marked but currently filtered out
-		return
-	}
-	actRow = (center) ? pos - Math.floor(dispCnt/2) : pos
 	sendRows(0)
 }
 
@@ -108,13 +102,13 @@ function sendRows(dir = -1, scrollTo) {
 	postMessage({tbl: makeTbl(dat), actRow: actRow, endRow: endRow, len: len})
 }
 
-function getRandom(cb = callback, jump = true, src = filtered) {
-	// return random row(s)
-	if (src.length === 0) return
-	const rngRow = src[getRandomInt(0, src.length-1)]
+function getRandom(cb) {
+	// return a random row, jump to it and mark it
+	if (filtered.length === 0) return
+	const rngRow = filtered[getRandomInt(0, filtered.length-1)]
 	//console.log('getRandom', rngRow)
 	postMessage( {rng: rngRow, idx: rngRow._i, callback: cb} )
-	if (jump) gotoRow(rngRow._i)
+	gotoRow(rngRow._i)
 }
 function getRandomInt(min, max) {
 	const byteArray = new Uint32Array(1)	// Uint16 = 0..65,535, Uint32 = 0..4,294,967,295
@@ -236,15 +230,11 @@ onmessage = function(e) {
 		return
 	}
 	if (e.data.sel !== undefined && e.data.sel !== '') { // jump to and mark row, index inside data
-		gotoRow(e.data.sel*1, e.data.center !== false)
+		gotoRow(e.data.sel*1)
 		return
 	}
 	if (e.data.mark !== undefined && e.data.mark !== '') { // mark only, do not scroll
-		gotoRow(e.data.mark*1, true, false)
-		return
-	}
-	if (e.data.cb) {
-		callback = e.data.cb
+		gotoRow(e.data.mark*1, false)
 		return
 	}
 	if (e.data.src) {
@@ -270,7 +260,7 @@ onmessage = function(e) {
 			break
 		case 'rng':	// alias
 		case 'getRandom':
-			getRandom(e.data.callback, e.data.jump)	// (cb, jump, source) source filtered = default
+			getRandom(e.data.callback)	// cb name is optional, defaults to the cb attribute
 			break
 		default:
 			console.error('Unknown message from Module got: ', e.data)
