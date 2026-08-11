@@ -69,6 +69,10 @@ template.innerHTML = `
 #myTblDiv table td.hidden {
 	display: none;
 }
+#myTblDiv table tr.sel td {
+	/* marked row, override with css attribute: :host{--kk-sel:#F004} */
+	background: var(--kk-sel, #08F4);
+}
 </style>
 <div id="kkOuter">
 	<input id="fInput" placeholder="Type search term"/>
@@ -76,7 +80,7 @@ template.innerHTML = `
 	<div id="myTblDiv"></div>
 </div>`
 
-window.kkRowsCallback = (o, cb, evNum) => {
+window.kkRowsCallback = (o, cb, evNum, idx) => {
 	// bit hacky in window global but onclick needs that
 	// Events: LMB, RMB, DBL, DRAG, RNG
 	const evTyp = ['LMB','RMB','DBL']
@@ -86,6 +90,7 @@ window.kkRowsCallback = (o, cb, evNum) => {
 			from: o.parentElement.parentElement.getRootNode().host.id,
 			sel: o.innerText,
 			ev: evTyp[evNum],
+			idx: o.parentElement.dataset.idx *1,	// index inside data, feed back into goto()
 		}
 		o.parentElement.querySelectorAll('td').forEach((td, ind) => {
 			j[ind] = td.innerHTML
@@ -94,7 +99,8 @@ window.kkRowsCallback = (o, cb, evNum) => {
 		// random or next/prev, feels even more hacky
 		j = {
 			rng: o,
-			ev: 'RNG'
+			ev: 'RNG',
+			idx: idx,
 		}
 	}
 	cb(j)
@@ -102,7 +108,7 @@ window.kkRowsCallback = (o, cb, evNum) => {
 
 export class kkRows extends HTMLElement {
 	static get observedAttributes() {
-		return ['data', 'src', 'head', 'cb', 'hide', 'css']
+		return ['data', 'src', 'head', 'cb', 'hide', 'css', 'sel']
 	}
 
 	constructor() {
@@ -151,7 +157,12 @@ export class kkRows extends HTMLElement {
 			}
 
 			if (e.data.rng) {
-				window.kkRowsCallback(e.data.rng, eval(e.data.callback))	// evil eval
+				window.kkRowsCallback(e.data.rng, eval(e.data.callback), 4, e.data.idx)	// evil eval
+				return
+			}
+
+			if (e.data.selHidden !== undefined) {
+				// marked row is not part of the current filter, mark stays and shows up again when it matches
 				return
 			}
 
@@ -206,6 +217,16 @@ export class kkRows extends HTMLElement {
 
 		}
 	} // initHandler
+
+	goto(idx, center = true) {
+		// jump to row and mark it, idx is the index inside data (see idx of the click callback)
+		this.worker.postMessage({sel: idx, center: center})
+	}
+
+	random(cb) {
+		// random row, jumps to it and marks it, cb name defaults to the cb attribute
+		this.worker.postMessage({msg: 'getRandom', callback: cb, jump: true})
+	}
 
 	resizer() {
 		const myTblDiv = this._shadowRoot.getElementById('myTblDiv')

@@ -56,3 +56,7 @@
 #myTblDiv table td.hidden {
 	display: none;
 }
+#myTblDiv table tr.sel td {
+	/* marked row, override with css attribute: :host{--kk-sel:#F004} */
+	background: var(--kk-sel, #08F4);
+}

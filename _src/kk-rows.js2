@@ -6,7 +6,7 @@
 </div>
 `
 
-window.kkRowsCallback = (o, cb, evNum) => {
+window.kkRowsCallback = (o, cb, evNum, idx) => {
 	// bit hacky in window global but onclick needs that
 	// Events: LMB, RMB, DBL, DRAG, RNG
 	const evTyp = ['LMB','RMB','DBL']
@@ -16,6 +16,7 @@ window.kkRowsCallback = (o, cb, evNum) => {
 			from: o.parentElement.parentElement.getRootNode().host.id,
 			sel: o.innerText,
 			ev: evTyp[evNum],
+			idx: o.parentElement.dataset.idx *1,	// index inside data, feed back into goto()
 		}
 		o.parentElement.querySelectorAll('td').forEach((td, ind) => {
 			j[ind] = td.innerHTML
@@ -24,7 +25,8 @@ window.kkRowsCallback = (o, cb, evNum) => {
 		// random or next/prev, feels even more hacky
 		j = {
 			rng: o,
-			ev: 'RNG'
+			ev: 'RNG',
+			idx: idx,
 		}
 	}
 	cb(j)
@@ -32,7 +34,7 @@ window.kkRowsCallback = (o, cb, evNum) => {
 
 export class kkRows extends HTMLElement {
 	static get observedAttributes() {
-		return ['data', 'src', 'head', 'cb', 'hide', 'css']
+		return ['data', 'src', 'head', 'cb', 'hide', 'css', 'sel']
 	}
 
 	constructor() {

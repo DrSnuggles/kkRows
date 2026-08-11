@@ -31,7 +31,12 @@
 			}
 
 			if (e.data.rng) {
-				window.kkRowsCallback(e.data.rng, eval(e.data.callback))	// evil eval
+				window.kkRowsCallback(e.data.rng, eval(e.data.callback), 4, e.data.idx)	// evil eval
+				return
+			}
+
+			if (e.data.selHidden !== undefined) {
+				// marked row is not part of the current filter, mark stays and shows up again when it matches
 				return
 			}
 
@@ -86,6 +91,16 @@
 
 		}
 	} // initHandler
+
+	goto(idx, center = true) {
+		// jump to row and mark it, idx is the index inside data (see idx of the click callback)
+		this.worker.postMessage({sel: idx, center: center})
+	}
+
+	random(cb) {
+		// random row, jumps to it and marks it, cb name defaults to the cb attribute
+		this.worker.postMessage({msg: 'getRandom', callback: cb, jump: true})
+	}
 
 	resizer() {
 		const myTblDiv = this._shadowRoot.getElementById('myTblDiv')

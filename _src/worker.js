@@ -13,6 +13,27 @@ let dispCnt = 1 // how many rows do we want to display (todo: determine by conta
 let head = []
 let callback = false
 let hide = []
+let selIdx = -1 // marked row, index inside data (survives filtering)
+
+function setIndex() {
+	// remember the position inside data on every row, _i is ignored by join/forEach/slice
+	// filtered holds the same row references, so the index stays valid while filtering
+	data.forEach((r, i) => r._i = i)
+	selIdx = -1
+}
+
+function gotoRow(idx, center = true) {
+	// jump to and mark a row, idx is the index inside data
+	if (isNaN(idx)) return
+	selIdx = idx
+	const pos = filtered.findIndex((r) => r._i === idx)
+	if (pos === -1) {
+		postMessage({selHidden: idx}) // marked but currently filtered out
+		return
+	}
+	actRow = (center) ? pos - Math.floor(dispCnt/2) : pos
+	sendRows(0)
+}
 
 function filter(wordStr) {
 	console.time('Filter')
@@ -68,7 +89,7 @@ function filter(wordStr) {
 function sendRows(dir = -1, scrollTo) {
 	// find how many rows to display
 	const len = filtered.length
-	let stepSize = (dir == 1) ? dispCnt/2 : -dispCnt/2
+	let stepSize = (dir === 0) ? 0 : (dir == 1) ? dispCnt/2 : -dispCnt/2
 	actRow += stepSize
 	if (scrollTo == scrollTo*1) actRow = scrollTo * len
 	actRow = Math.floor(actRow)
@@ -83,11 +104,13 @@ function sendRows(dir = -1, scrollTo) {
 	postMessage({tbl: makeTbl(dat), actRow: actRow, endRow: endRow, len: len})
 }
 
-function getRandom(callback, amount = 1, src = filtered) {
+function getRandom(cb = callback, jump = false, src = filtered) {
 	// return random row(s)
+	if (src.length === 0) return
 	const rngRow = src[getRandomInt(0, src.length-1)]
 	//console.log('getRandom', rngRow)
-	postMessage( {rng: rngRow, callback: callback} )
+	postMessage( {rng: rngRow, idx: rngRow._i, callback: cb} )
+	if (jump) gotoRow(rngRow._i)
 }
 function getRandomInt(min, max) {
 	const byteArray = new Uint32Array(1)	// Uint16 = 0..65,535, Uint32 = 0..4,294,967,295
@@ -121,7 +144,7 @@ function makeTbl(rows) {
 		}
 		const colWidth = 100/(rows[0].length-hide.length)
 		rows.forEach((row) => {
-			html.push('<tr>')
+			html.push('<tr data-idx="'+ row._i +'"'+ ((row._i === selIdx) ? ' class="sel"' : '') +'>')
 			row.forEach((col, colInd) => {
 				//if (hide.indexOf(c+'') !== -1) continue // do not show this column, no want to keep maybe for IDs
 				const dispMe = (hide.indexOf(colInd+'') !== -1) ? ' class="hidden"' : ''
@@ -171,6 +194,7 @@ function parseCSV(t) {
 		head = data[0]
 		data.splice(0,1)
 	}
+	setIndex()
 	filtered = [...data]
 	console.timeEnd('parseCSV')
 	actRow = 0
@@ -181,6 +205,7 @@ function parseCSV(t) {
 function parseJSON(j) {
 	console.time('parseJSON')
 	data = j
+	setIndex()
 	filtered = [...data]
 	console.timeEnd('parseJSON')
 	actRow = 0
@@ -211,6 +236,10 @@ onmessage = function(e) {
 		sendRows(-1, actRow/filtered.length)
 		return
 	}
+	if (e.data.sel !== undefined && e.data.sel !== '') { // jump to and mark row, index inside data
+		gotoRow(e.data.sel*1, e.data.center !== false)
+		return
+	}
 	if (e.data.cb) {
 		callback = e.data.cb
 		return
@@ -236,8 +265,9 @@ onmessage = function(e) {
 		case 'getRows':
 			sendRows(e.data.dir, e.data.scrollTo)
 			break
+		case 'rng':	// alias
 		case 'getRandom':
-			getRandom(e.data.callback)	// (cb, amount, source) source filtered = default
+			getRandom(e.data.callback, e.data.jump)	// (cb, jump, source) source filtered = default
 			break
 		default:
 			console.error('Unknown message from Module got: ', e.data)
