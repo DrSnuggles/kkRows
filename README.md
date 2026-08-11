@@ -18,6 +18,12 @@ Every row knows its index inside the data, it survives filtering and comes back 
 - if the marked row is filtered away the mark is kept, it shows up again as soon as it matches the filter
 - style of the marked row: `css="..."` attribute with `:host{--kk-sel:#F004}`
 
+## Events
+Rows have no inline handlers anymore, the module listens on the table container. Beside the `cb` attribute every row event is also a `kk-rows` CustomEvent with the same object in `detail`:
+```js
+myTbl.addEventListener('kk-rows', (e) => console.log(e.detail.ev, e.detail.idx, e.detail.sel))
+```
+
 Round trip, click a row and come back to it later:
 ```js
 let last

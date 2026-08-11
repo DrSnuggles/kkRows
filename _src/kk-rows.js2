@@ -7,7 +7,7 @@
 `
 
 window.kkRowsCallback = (o, cb, evNum, idx) => {
-	// bit hacky in window global but onclick needs that
+	// builds the callback object, kept global for compatibility
 	// Events: LMB, RMB, DBL, DRAG, RNG
 	const evTyp = ['LMB','RMB','DBL']
 	let j
@@ -29,7 +29,8 @@ window.kkRowsCallback = (o, cb, evNum, idx) => {
 			idx: idx,
 		}
 	}
-	cb(j)
+	if (typeof cb === 'function') cb(j)
+	return j
 }
 
 export class kkRows extends HTMLElement {

@@ -81,7 +81,7 @@ template.innerHTML = `
 </div>`
 
 window.kkRowsCallback = (o, cb, evNum, idx) => {
-	// bit hacky in window global but onclick needs that
+	// builds the callback object, kept global for compatibility
 	// Events: LMB, RMB, DBL, DRAG, RNG
 	const evTyp = ['LMB','RMB','DBL']
 	let j
@@ -103,7 +103,8 @@ window.kkRowsCallback = (o, cb, evNum, idx) => {
 			idx: idx,
 		}
 	}
-	cb(j)
+	if (typeof cb === 'function') cb(j)
+	return j
 }
 
 export class kkRows extends HTMLElement {
@@ -157,7 +158,7 @@ export class kkRows extends HTMLElement {
 			}
 
 			if (e.data.rng) {
-				window.kkRowsCallback(e.data.rng, eval(e.data.callback), 4, e.data.idx)	// evil eval
+				this.fire( window.kkRowsCallback(e.data.rng, null, 4, e.data.idx), e.data.callback )
 				return
 			}
 
@@ -173,7 +174,25 @@ export class kkRows extends HTMLElement {
 
 	} // initWorker
 
+	fire(j, cbName = this.cb) {
+		// CustomEvent for addEventListener('kk-rows', ...) and the cb attribute for the old way
+		this.dispatchEvent( new CustomEvent('kk-rows', {detail: j, bubbles: true, composed: true}) )
+		const cb = (typeof cbName === 'function') ? cbName : window[cbName]
+		if (typeof cb === 'function') cb(j)
+	}
+
 	initHandler() {
+		// row events, delegated so the rows stay free of inline handlers
+		const evNum = {click: 0, contextmenu: 1, dblclick: 2}
+		const myTblDiv = this._shadowRoot.getElementById('myTblDiv')
+		for (const evName in evNum) {
+			myTblDiv.addEventListener(evName, (e) => {
+				const td = e.target.closest('td')
+				if (!td) return
+				this.fire( window.kkRowsCallback(td, null, evNum[evName]) )
+			})
+		}
+
 		// resize
 		const ro = new ResizeObserver(entries => {
 			for (let entry of entries) {
@@ -244,6 +263,8 @@ export class kkRows extends HTMLElement {
 		//console.log('attribute changed', att, old, upd)
 
 		// attributes we need to handle here
+		if (att == 'cb') this.cb = upd	// name of the callback function, also send to worker as rng default
+
 		if (att == 'css') {
 			this._shadowRoot.children[0].insertAdjacentHTML('afterEnd', `<style>${upd.replace(/\n/g,'')}</style>` )
 			return

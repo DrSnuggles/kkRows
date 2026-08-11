@@ -136,19 +136,14 @@ function makeTbl(rows) {
 	}
 
 	if (rows.length > 0) {
-		let onLMB = '', onDBL = '', onRMB = ''
-		if (callback) {
-			onLMB = ' onclick="kkRowsCallback(this,'+ callback +',0)"'
-			onDBL = ' ondblclick="kkRowsCallback(this,'+ callback +',2)"'
-			onRMB = ' oncontextmenu="kkRowsCallback(this,'+ callback +',1)"'
-		}
+		// no inline handlers, the module listens on the table container (event delegation)
 		const colWidth = 100/(rows[0].length-hide.length)
 		rows.forEach((row) => {
 			html.push('<tr data-idx="'+ row._i +'"'+ ((row._i === selIdx) ? ' class="sel"' : '') +'>')
 			row.forEach((col, colInd) => {
 				//if (hide.indexOf(c+'') !== -1) continue // do not show this column, no want to keep maybe for IDs
 				const dispMe = (hide.indexOf(colInd+'') !== -1) ? ' class="hidden"' : ''
-				html.push('<td'+ onLMB + onRMB + onDBL + dispMe +' width="'+ colWidth +'%" title="'+ col +'">'+ col +'</td>')
+				html.push('<td'+ dispMe +' width="'+ colWidth +'%" title="'+ col +'">'+ col +'</td>')
 			})
 			html.push('</tr>')
 		})
