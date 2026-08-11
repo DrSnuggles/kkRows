@@ -189,7 +189,9 @@ export class kkRows extends HTMLElement {
 			myTblDiv.addEventListener(evName, (e) => {
 				const td = e.target.closest('td')
 				if (!td) return
-				this.fire( window.kkRowsCallback(td, null, evNum[evName]) )
+				const j = window.kkRowsCallback(td, null, evNum[evName])
+				this.mark(j.idx)	// clicked row gets marked, hide it with :host{--kk-sel:transparent}
+				this.fire(j)
 			})
 		}
 
@@ -242,9 +244,14 @@ export class kkRows extends HTMLElement {
 		this.worker.postMessage({sel: idx, center: center})
 	}
 
+	mark(idx) {
+		// mark a row without scrolling to it
+		this.worker.postMessage({mark: idx})
+	}
+
 	random(cb) {
 		// random row, jumps to it and marks it, cb name defaults to the cb attribute
-		this.worker.postMessage({msg: 'getRandom', callback: cb, jump: true})
+		this.worker.postMessage({msg: 'getRandom', callback: cb})
 	}
 
 	resizer() {

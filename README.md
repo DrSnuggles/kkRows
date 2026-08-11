@@ -12,11 +12,13 @@
 Every row knows its index inside the data, it survives filtering and comes back with every callback as `idx`.
 
 - `myTbl.goto(idx)` scrolls the row into the middle of the view and marks it, `myTbl.goto(idx, false)` puts it on top
-- `<kk-rows sel="123">` does the same, so it also works from HTML
+- `myTbl.mark(idx)` marks without scrolling
+- `<kk-rows sel="123">` jumps and marks like goto, so it also works from HTML
 - `myTbl.random()` picks a random row, jumps to it, marks it and calls the `cb` callback, the callback object has `ev:'RNG'` and `idx`
-- the old `{msg:'rng'}` postMessage stays as it was, add `jump:true` to make it jump and mark too
+- the old `{msg:'rng'}` postMessage jumps and marks now as well, use `jump:false` for the old behaviour
+- clicking a row marks it, the view stays where it is
 - if the marked row is filtered away the mark is kept, it shows up again as soon as it matches the filter
-- style of the marked row: `css="..."` attribute with `:host{--kk-sel:#F004}`
+- style of the marked row: `css="..."` attribute with `:host{--kk-sel:#F004}`, `transparent` switches it off
 
 ## Events
 Rows have no inline handlers anymore, the module listens on the table container. Beside the `cb` attribute every row event is also a `kk-rows` CustomEvent with the same object in `detail`:

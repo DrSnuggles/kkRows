@@ -22,10 +22,14 @@ function setIndex() {
 	selIdx = -1
 }
 
-function gotoRow(idx, center = true) {
+function gotoRow(idx, center = true, scroll = true) {
 	// jump to and mark a row, idx is the index inside data
 	if (isNaN(idx)) return
 	selIdx = idx
+	if (!scroll) { // mark only, view stays where it is
+		sendRows(0)
+		return
+	}
 	const pos = filtered.findIndex((r) => r._i === idx)
 	if (pos === -1) {
 		postMessage({selHidden: idx}) // marked but currently filtered out
@@ -104,7 +108,7 @@ function sendRows(dir = -1, scrollTo) {
 	postMessage({tbl: makeTbl(dat), actRow: actRow, endRow: endRow, len: len})
 }
 
-function getRandom(cb = callback, jump = false, src = filtered) {
+function getRandom(cb = callback, jump = true, src = filtered) {
 	// return random row(s)
 	if (src.length === 0) return
 	const rngRow = src[getRandomInt(0, src.length-1)]
@@ -233,6 +237,10 @@ onmessage = function(e) {
 	}
 	if (e.data.sel !== undefined && e.data.sel !== '') { // jump to and mark row, index inside data
 		gotoRow(e.data.sel*1, e.data.center !== false)
+		return
+	}
+	if (e.data.mark !== undefined && e.data.mark !== '') { // mark only, do not scroll
+		gotoRow(e.data.mark*1, true, false)
 		return
 	}
 	if (e.data.cb) {
