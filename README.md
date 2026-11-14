@@ -1,5 +1,9 @@
 # kkRows
 
+## Build
+
+Install [Bun](https://bun.com/) and run `bun run build`.
+
 ## ToDo
 - Fix that thead and tbody have different childLength, thats unnice for CSS and brain
 - Displays a line too much if header is present, could not find anymore...

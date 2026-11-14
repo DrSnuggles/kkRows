@@ -2,9 +2,8 @@
   "name": "kk-rows",
   "version": "1.0.0",
   "description": "Display million of rows in browser",
-  "main": "gulpfile.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "bun run build.mjs"
   },
   "repository": {
     "type": "git",
@@ -20,12 +19,5 @@
     "url": "https://github.com/DrSnuggles/kkRows/issues"
   },
   "homepage": "https://github.com/DrSnuggles/kkRows#readme",
-  "devDependencies": {
-    "gulp": "^4.0.2",
-    "gulp-brotli": "^3.0.0",
-    "gulp-clean-css": "^4.3.0",
-    "gulp-concat": "^2.6.1",
-    "gulp-terser": "^2.1.0",
-	"gulp-watch": "^5.0.1"
-  }
+  "type": "module"
 }
